@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>De Grote Woordenschat Challenge</title>
+<style>
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#eef5ff,#fff7e8);margin:0;color:#24324a}
+.wrap{max-width:900px;margin:auto;padding:28px 18px}.card{background:white;border-radius:22px;padding:28px;box-shadow:0 8px 30px #0001}
+h1{font-size:34px;margin:0 0 8px}.sub{color:#64748b}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+button{border:0;border-radius:12px;padding:12px 16px;background:#3157d5;color:white;font-weight:700;cursor:pointer}button.alt{background:#e8eefc;color:#2444a8}button:hover{transform:translateY(-1px)}
+.option{display:block;width:100%;text-align:left;margin:10px 0;background:#f1f5f9;color:#24324a}.option.correct{background:#c9f7d5}.option.wrong{background:#ffd4d4}
+.feedback{font-weight:700;margin:16px 0;min-height:24px}.score{font-size:18px;font-weight:700}.progress{height:10px;background:#e5e7eb;border-radius:9px;overflow:hidden;margin:15px 0}.bar{height:100%;background:#3157d5;width:0}
+input{padding:13px;border:2px solid #dbe3f0;border-radius:10px;font-size:17px;width:80%;max-width:500px}
+.hidden{display:none}
+.flashcard{perspective:1000px;max-width:650px;margin:20px auto;cursor:pointer}
+.flash-inner{position:relative;min-height:250px;transition:transform .55s;transform-style:preserve-3d}
+.flashcard.flipped .flash-inner{transform:rotateY(180deg)}
+.flash-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;padding:30px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#eef3ff;border:3px solid #d8e2ff}
+.flash-back{transform:rotateY(180deg);background:#f3fbf5;border-color:#d2eed8}
+.flash-word{font-size:34px;font-weight:800;margin:15px}
+.flash-meaning{font-size:22px;line-height:1.4}
+.flash-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.badge{display:inline-block;padding:7px 10px;border-radius:20px;background:#fff0bf;margin:4px}
+.small{font-size:13px;color:#64748b}.result{font-size:25px;font-weight:800}
+</style></head>
+<body><div class="wrap"><div class="card">
+<h1>🎯 De Grote Woordenschat Challenge</h1>
+<p class="sub">Taalschat: de persoonsbeschrijving · oefen, krijg meteen feedback en verbeter je score.</p>
+<div class="tabs">
+<button onclick="start('mc')">🎯 Betekenis</button>
+<button onclick="start('opp')">↔️ Tegenovergestelde</button>
+<button onclick="start('fill')">✏️ Invulzinnen</button>
+<button onclick="start('mix')">🏆 Eindchallenge</button><button onclick="startFlashcards()">🃏 Flashcards</button>
+</div>
+<div id="game"></div>
+</div></div>
+<script>
+const D = {"mc": [{"q": "Wat betekent ‘de boekenwurm’?", "a": ["iemand die veel en graag boeken leest", "iemand die graag thuisblijft", "iemand die snel boos wordt"], "correct": 0}, {"q": "Wie is de ‘driftkikker’?", "a": ["iemand die heel secuur is", "iemand die zich snel boos maakt", "iemand die veel leest"], "correct": 1}, {"q": "Wat is een ‘handige harry’?", "a": ["iemand die technisch bekwaam is", "iemand die bang is", "iemand die altijd de schuld krijgt"], "correct": 0}, {"q": "Wat betekent ‘de huismus’?", "a": ["iemand die veel werkt", "iemand die graag thuisblijft", "iemand die graag alle nieuwtjes kent"], "correct": 1}, {"q": "Wat is een ‘muggenzifter’?", "a": ["iemand die op details vit", "iemand die graag avontuur beleeft", "iemand die heel gul is"], "correct": 0}, {"q": "Wat betekent ‘naïef’?", "a": ["argwanend", "goedgelovig", "aanvallend"], "correct": 1}, {"q": "Wat betekent ‘roekeloos’?", "a": ["voorzichtig", "onbezonnen, lichtzinnig", "eigentijds"], "correct": 1}, {"q": "Wat betekent ‘wantrouwig’?", "a": ["argwanend", "vrolijk", "stijf"], "correct": 0}, {"q": "Wat betekent ‘frêle’?", "a": ["stevig", "breekbaar, broos", "professioneel"], "correct": 1}, {"q": "Wat betekent ‘doordacht’?", "a": ["weloverwogen", "wanordelijk", "eindeloos"], "correct": 0}], "opp": [{"q": "Wat is het tegenovergestelde van ‘actief’?", "a": ["passief", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘behendig’?", "a": ["klungelig", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘behoedzaam’?", "a": ["roekeloos", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘chaotisch’?", "a": ["ordelijk", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘conservatief’?", "a": ["progressief", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘doordacht’?", "a": ["onbezonnen", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘frêle’?", "a": ["robuust / stevig", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘flexibel’?", "a": ["star", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘fysiek’?", "a": ["mentaal", "hetzelfde woord"], "correct": 0}, {"q": "Wat is het tegenovergestelde van ‘goedgemutst’?", "a": ["humeurig", "hetzelfde woord"], "correct": 0}], "fill": [["Gregory is een echt ________: hij studeert urenlang en maakt veel oefeningen opnieuw.", "werkpaard"], ["Sara is een echte ________: ze blijft het liefst thuis.", "huismus"], ["De leerling die voortdurend op kleine details let, is een ________.", "muggenzifter"], ["Wie snel bang is en weinig durft, is een ________.", "angsthaas"], ["Wie heel secuur en nauwkeurig werkt, is een ________.", "pietje-precies"], ["Een persoon die altijd de schuld krijgt, is de ________.", "zondebok"], ["Wie opvliegend is en zich snel boos maakt, is een ________.", "driftkikker"], ["Wie ’s nachts heel lang opblijft, is een ________.", "nachtuil"]], "all": [["de angsthaas", "iemand die snel bang is en weinig durft"], ["de benjamin", "de jongste"], ["de boekenwurm", "iemand die veel en graag boeken leest"], ["de brave hendrik", "iemand die niet durft tegen te spreken en steeds goed is"], ["de casanova", "een vrouwenversierder"], ["de driftkikker", "iemand die opvliegend is en zich snel boos maakt"], ["de handige harry", "iemand die handig is, technisch bekwaam is"], ["de houten klaas", "iemand die stijfjes is in gedrag en amper lacht"], ["de huismus", "iemand die graag thuisblijft en weinig avontuurlijk is"], ["het kuddedier", "iemand die steeds het oordeel van de groep volgt"], ["de muggenzifter", "een betweterig persoon die op details vit"], ["de nachtuil", "iemand die ’s nachts heel lang opblijft"], ["het nieuwsgierig aagje", "iemand die graag alle nieuwtjes wil weten"], ["de ongelovige thomas", "iemand die argwanend is en niets zomaar gelooft"], ["de pechvogel", "iemand die heel veel tegenslagen kent"], ["het pietje-precies", "iemand die heel secuur/nauwkeurig is, een perfectionist"], ["de spring-in-’t-veld", "iemand die speels, frivool en heel beweeglijk is"], ["de vrolijke frans", "iemand die lollig doet, een lolbroek"], ["de ware jakob", "de ware, perfecte liefde"], ["het werkpaard", "iemand die heel hard werkt"], ["de zondebok", "een persoon die altijd de schuld krijgt, terecht of onterecht"], ["schofferen", "zeer onbeschoft behandelen"], ["terugdeinzen", "achteruit gaan omdat je bang bent"], ["actief", "werkzaam"], ["behendig", "bedreven, snel"], ["behoedzaam", "voorzichtig"], ["chaotisch", "wanordelijk"], ["conservatief", "behoudsgezind"], ["doordacht", "weloverwogen"], ["frêle", "breekbaar, broos"], ["flexibel", "soepel, meegaand"], ["fysiek", "lichamelijk"], ["goedgemutst", "goedgezind, vrolijk"], ["gul", "vrijgevig, royaal"], ["heldhaftig", "moedig, dapper"], ["klungelig", "onhandig, klunzig"], ["kwistig", "vrijgevig, royaal"], ["maximaal", "het meeste"], ["modern", "eigentijds"], ["naïef", "goedgelovig"], ["offensief", "aanvallend"], ["officieel", "wettig, formeel"], ["onbezonnen", "ondoordacht"], ["onuitputtelijk", "eindeloos"], ["professioneel", "van beroep"], ["roekeloos", "onbezonnen, lichtzinnig"], ["sociaal", "communicatief"], ["speels", "dartel, beweeglijk"], ["star", "stijf"], ["teruggetrokken", "eenzaam, alleenstaand"], ["wantrouwig", "argwanend"]]};
+let mode='', qs=[], i=0, score=0, answered=false;
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function start(m){
+ mode=m;i=0;score=0;answered=false;
+ if(m==='mc') qs=shuffle(D.mc);
+ else if(m==='opp') qs=shuffle(D.opp);
+ else if(m==='fill') qs=shuffle(D.fill);
+ else qs=shuffle([...D.mc.slice(0,5),...D.opp.slice(0,5),...D.fill.slice(0,5)]);
+ render();
+}
+function render(){
+ if(i>=qs.length){finish();return}
+ answered=false;
+ let q=qs[i], type=mode;
+ if(mode==='mix'){type=q.q?'mix':'fill'}
+ let html=`<div class="score">Score: ${score}/${i}</div><div class="progress"><div class="bar" style="width:${(i/qs.length)*100}%"></div></div>`;
+ if(type==='fill'){
+   html+=`<h2>✏️ Vul aan</h2><p>${q[0]}</p><input id="ans" autocomplete="off" onkeydown="if(event.key==='Enter')checkFill()"><button onclick="checkFill()">Controleer</button><div class="feedback" id="fb"></div>`;
+ } else {
+   html+=`<h2>${type==='opp'?'↔️ Tegenovergestelde':'🎯 Kies het juiste antwoord'}</h2><p>${q.q}</p>`;
+   let opts=shuffle(q.a.map((x,j)=>({x,j})));
+   opts.forEach(o=>html+=`<button class="option" onclick="checkMC(this,${o.j},${q.correct})">${o.x}</button>`);
+   html+=`<div class="feedback" id="fb"></div>`;
+ }
+ html+=`<p class="small">Vraag ${i+1} van ${qs.length}</p>`;
+ document.getElementById('game').innerHTML=html;
+}
+function checkMC(btn,j,c){
+ if(answered)return; answered=true;
+ let ok=j===c; if(ok)score++;
+ document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+ btn.classList.add(ok?'correct':'wrong');
+ document.getElementById('fb').textContent=ok?'✅ Juist!':'❌ Niet juist. Kijk de betekenis nog eens na.';
+ setTimeout(()=>{i++;render()},900);
+}
+function checkFill(){
+ if(answered)return;
+ let val=document.getElementById('ans').value.trim().toLowerCase();
+ let correct=qs[i][1].toLowerCase();
+ let ok=val===correct || val.replace('de ','')===correct.replace('de ','') || val.replace('het ','')===correct.replace('het ','');
+ answered=true;if(ok)score++;
+ document.getElementById('fb').textContent=ok?'✅ Juist!':'❌ Nog niet. Het juiste antwoord is: '+qs[i][1];
+ setTimeout(()=>{i++;render()},1300);
+}
+function finish(){
+ let pct=Math.round(score/qs.length*100);
+ let msg=pct>=90?'🏆 Goud! Jij kent deze woordenschat uitstekend!':pct>=70?'🥈 Zilver! Heel goed, maar er is nog wat te oefenen.':pct>=50?'🥉 Brons! Je bent goed op weg.':'💪 Blijven oefenen! Je kunt je score zeker verbeteren.';
+ document.getElementById('game').innerHTML=`<div class="result">${msg}</div><p>Je behaalde <strong>${score}/${qs.length}</strong> (${pct}%).</p><button onclick="start(mode)">🔄 Opnieuw spelen</button>`;
+}
+
+let fc=[], fcIndex=0;
+function startFlashcards(){
+  fc=shuffle(D.all); fcIndex=0; renderFlashcard();
+}
+function renderFlashcard(){
+  if(fcIndex>=fc.length){
+    document.getElementById('game').innerHTML=`<div class="result">🎉 Alle flashcards doorlopen!</div><p>Goed gewerkt. Je hebt ${fc.length} woorden geoefend.</p><button onclick="startFlashcards()">🔄 Opnieuw</button>`;
+    return;
+  }
+  const item=fc[fcIndex];
+  document.getElementById('game').innerHTML=`
+    <div class="score">🃏 Flashcard ${fcIndex+1}/${fc.length}</div>
+    <div class="progress"><div class="bar" style="width:${(fcIndex/fc.length)*100}%"></div></div>
+    <div class="flashcard" id="fc" onclick="flipCard()">
+      <div class="flash-inner">
+        <div class="flash-face">
+          <div class="small">Klik op de kaart om om te draaien</div>
+          <div class="flash-word">${item[0]}</div>
+          <div class="small">Wat betekent dit woord?</div>
+        </div>
+        <div class="flash-face flash-back">
+          <div class="small">Betekenis</div>
+          <div class="flash-meaning">${item[1]}</div>
+        </div>
+      </div>
+    </div>
+    <div class="flash-controls">
+      <button class="alt" onclick="prevCard()">← Vorige</button>
+      <button onclick="flipCard()">🔄 Draai kaart</button>
+      <button onclick="nextCard()">Volgende →</button>
+    </div>
+    <p class="small">Tip: probeer de betekenis eerst zelf te zeggen vóór je de kaart omdraait.</p>`;
+}
+function flipCard(){document.getElementById('fc')?.classList.toggle('flipped')}
+function nextCard(){if(fcIndex<fc.length-1){fcIndex++;renderFlashcard()}}
+function prevCard(){if(fcIndex>0){fcIndex--;renderFlashcard()}}
+
+start('mix');
+</script></body></html>
